@@ -76,6 +76,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A4AB332A2A2B697600DCC194 /* API */ = {
+			isa = PBXGroup;
+			children = (
+				A4C5784A2A26832F003B3001 /* ApiManager.swift */,
+			);
+			path = API;
+			sourceTree = "<group>";
+		};
 		A4C5780E2A26822B003B3001 = {
 			isa = PBXGroup;
 			children = (
@@ -104,7 +112,7 @@
 				A4C5781A2A26822B003B3001 /* AppDelegate.swift */,
 				A4C5781C2A26822B003B3001 /* SceneDelegate.swift */,
 				A4C5781E2A26822B003B3001 /* ViewController.swift */,
-				A4C5784A2A26832F003B3001 /* ApiManager.swift */,
+				A4AB332A2A2B697600DCC194 /* API */,
 				A4C578252A26822D003B3001 /* LaunchScreen.storyboard */,
 			);
 			path = Pokedex;
