@@ -9,8 +9,8 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    var pokemonArray = ["pikachu", "bulbasaur", "charmander", "squirtle"]
-    var selectedPokemon = "pikachu"
+    var pokemonArray = [""]
+    lazy var selectedPokemon = pokemonArray[0]
     
     let manager = APIManager()
     
@@ -99,7 +99,7 @@ class ViewController: UIViewController {
             switch response {
             case .success(let pokemon):
                 self.getAvatar(string: pokemon.sprites.front_default)
-                self.label.text = pokemon.forms[0].name + " " + "height: \(pokemon.height), weight \(pokemon.weight)"
+                self.label.text = pokemon.forms[0].name + " " + "height: \(Double(pokemon.height)/10), weight \(Double(pokemon.weight)/10)"
             case .failure(let error):
                 print(error)
             }

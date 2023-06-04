@@ -34,7 +34,27 @@ struct pokemonResponse: Decodable {
     }
     
     struct Sprites: Decodable {
+        let other: Other
         let front_default: String
+    }
+    
+    struct Other: Decodable {
+        let official: Official
+    }
+    
+    struct Official: Decodable {
+        let front_default: String
+    }
+    
+    private enum CodingKeys: String, CodingKey {
+        case forms
+        case height
+        case weight
+        case sprites
+        case name
+        case other
+        case official = "official-artwork"
+        case front_default
     }
 }
 
@@ -52,7 +72,6 @@ struct APIManager: ApiManagerInterface {
             if (error != nil) {
                 print(error as Any)
             } else {
-                let httpResponse = response as? HTTPURLResponse
                 do {
                     let decodedData = try JSONDecoder().decode(pokemonListResponse.self, from: data!)
                     DispatchQueue.main.async {
@@ -79,8 +98,6 @@ struct APIManager: ApiManagerInterface {
             if (error != nil) {
                 print(error as Any)
             } else {
-                let httpResponse = response as? HTTPURLResponse
-//                print(httpResponse)
                 do {
                     let decodedData = try JSONDecoder().decode(pokemonResponse.self, from: data!)
                     DispatchQueue.main.async {
