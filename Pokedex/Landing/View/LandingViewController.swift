@@ -7,10 +7,21 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+enum PokemonGeneration: String, CaseIterable {
     
-    var pokemonArray = [""]
-    lazy var selectedPokemon = pokemonArray[0]
+    case Generation1 = "?limit=151"
+    case Generation2 = "?offset=151&limit=100"
+    case Generation3 = "?offset=251&limit=135"
+    
+}
+
+class LandingViewController: UIViewController {
+    
+    private let viewModel: LandingViewModel
+    
+//    var pokemonArray = [PokemonGeneration]()
+//    lazy var selectedPokemon = pokemonArray[0]
+    lazy var selectedGeneration = PokemonGeneration.Generation1
     
     let manager = APIManager()
     
@@ -25,7 +36,7 @@ class ViewController: UIViewController {
         let button: UIButton = UIButton()
         button.setTitle("Search", for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(pokedex), for: .touchUpInside)
+        button.addTarget(self, action: #selector(getPokemonList), for: .touchUpInside)
         return button
     }()
     
@@ -43,6 +54,17 @@ class ViewController: UIViewController {
         image.translatesAutoresizingMaskIntoConstraints = false
         return image
     }()
+    
+    init(
+        viewModel: LandingViewModel
+    ){
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError()
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,7 +72,7 @@ class ViewController: UIViewController {
         VCPickerView.delegate = self
         
         setUpView()
-        getPokemonList()
+//        getPokemonList()
     }
     
     private func setUpView() {
@@ -79,32 +101,35 @@ class ViewController: UIViewController {
         ])
     }
     
-    func getPokemonList() {
-        manager.fetchPokemonList { response in
-            switch response {
-                case .success(let pokemonList):
-                self.pokemonArray = [String]()
-                for i in 0..<pokemonList.results.count {
-                    self.pokemonArray.append(pokemonList.results[i].name)
-                }
-                self.VCPickerView.reloadAllComponents()
-            case .failure(let error):
-                print(error)
-            }
-        }
+    @objc func getPokemonList() {
+//        manager.fetchPokemonList(generation: selectedGeneration.rawValue) { response in
+//            switch response {
+//                case .success(let pokemonList):
+////                self.pokemonArray = [String]()
+////                for i in 0..<pokemonList.results.count {
+////                    self.pokemonArray.append(pokemonList.results[i].name)
+////                }
+//                self.VCPickerView.reloadAllComponents()
+//            case .failure(let error):
+//                print(error)
+//            }
+//        }
+        viewModel.tapSearch(generation: selectedGeneration)
     }
     
     @objc func pokedex() {
-        manager.fetchPokemonData(of: selectedPokemon) { response in
-            switch response {
-            case .success(let pokemon):
-                self.getAvatar(string: pokemon.sprites.front_default)
-                self.label.text = pokemon.forms[0].name + " " + "height: \(Double(pokemon.height)/10), weight \(Double(pokemon.weight)/10)"
-            case .failure(let error):
-                print(error)
-            }
-        }
+        return
+//        manager.fetchPokemonData(of: selectedPokemon) { response in
+//            switch response {
+//            case .success(let pokemon):
+//                self.getAvatar(string: pokemon.sprites.other.official.front_default)
+//                self.label.text = pokemon.forms[0].name + " " + "height: \(Double(pokemon.height)/10), weight \(Double(pokemon.weight)/10)"
+//            case .failure(let error):
+//                print(error)
+//            }
+//        }
     }
+    
     func getAvatar(string: String) {
         manager.getPokemonAvatar(with: string) { response in
             switch response {
@@ -117,21 +142,22 @@ class ViewController: UIViewController {
     }
 }
 
-extension ViewController: UIPickerViewDataSource, UIPickerViewDelegate {
+extension LandingViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return pokemonArray.count
+        return PokemonGeneration.allCases.count
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return pokemonArray[row]
+        return "\(PokemonGeneration.allCases[row])"
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        selectedPokemon = pokemonArray[row]
+//        selectedPokemon = pokemonArray[row]
+        selectedGeneration = PokemonGeneration.allCases[row]
     }
 }

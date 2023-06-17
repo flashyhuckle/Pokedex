@@ -1,33 +1,28 @@
-//
-//  ApiManager.swift
-//  Pokedex
-//
-//  Created by Marcin Głodzik on 30/05/2023.
-//
-
 import UIKit
 
 protocol ApiManagerInterface {
-    func fetchPokemonList(onCompletion: @escaping ((Swift.Result<pokemonListResponse, Error>) -> Void))
+    func getPokemonList(generation: String, onCompletion: @escaping ((Swift.Result<PokemonListResponse, Error>) -> Void))
     
-    func fetchPokemonData(of pokemon: String, onCompletion: @escaping ((Swift.Result<pokemonResponse, Error>) -> Void))
+    func getPokemonData(of pokemon: String, onCompletion: @escaping ((Swift.Result<PokemonResponse, Error>) -> Void))
     
     func getPokemonAvatar(with url: String, onCompletion: @escaping ((Swift.Result<UIImage, Error>) -> Void))
 }
 
-struct pokemonListResponse: Decodable {
-    let results: [pokemon]
+struct PokemonListResponse: Decodable {
+    let results: [Pokemon]
     
-    struct pokemon: Decodable {
+    struct Pokemon: Decodable {
         let name: String
     }
 }
 
-struct pokemonResponse: Decodable {
+struct PokemonResponse: Decodable {
     let forms: [Form]
     let height: Int
     let weight: Int
     let sprites: Sprites
+    let types: [Types]
+    let id: Int
     
     struct Form: Decodable {
         let name: String
@@ -40,28 +35,37 @@ struct pokemonResponse: Decodable {
     
     struct Other: Decodable {
         let official: Official
+        
+        private enum CodingKeys: String, CodingKey {
+            case official = "official-artwork"
+        }
     }
     
     struct Official: Decodable {
         let front_default: String
     }
     
-    private enum CodingKeys: String, CodingKey {
-        case forms
-        case height
-        case weight
-        case sprites
-        case name
-        case other
-        case official = "official-artwork"
-        case front_default
+    struct Types: Decodable {
+        let type: PokemonType
     }
+    struct PokemonType: Decodable {
+        let name: String
+    }
+}
+
+struct Pokemon {
+    let number: Int
+    let name: String
+    let height: Int
+    let weight: Int
+    let image: UIImage
+    let mainType: String
 }
 
 struct APIManager: ApiManagerInterface {
     
-    func fetchPokemonList(onCompletion: @escaping ((Result<pokemonListResponse, Error>) -> Void)) {
-        let urlString = "https://pokeapi.co/api/v2/pokemon/?limit=151"
+    func getPokemonList(generation: String, onCompletion: @escaping ((Result<PokemonListResponse, Error>) -> Void)) {
+        let urlString = "https://pokeapi.co/api/v2/pokemon/" + generation
         let request = NSMutableURLRequest(url: NSURL(string: urlString)! as URL,
                                           cachePolicy: .useProtocolCachePolicy,
                                           timeoutInterval: 10.0)
@@ -73,7 +77,7 @@ struct APIManager: ApiManagerInterface {
                 print(error as Any)
             } else {
                 do {
-                    let decodedData = try JSONDecoder().decode(pokemonListResponse.self, from: data!)
+                    let decodedData = try JSONDecoder().decode(PokemonListResponse.self, from: data!)
                     DispatchQueue.main.async {
                         onCompletion(.success(decodedData))
                     }
@@ -82,11 +86,10 @@ struct APIManager: ApiManagerInterface {
                 }
             }
         })
-        
         dataTask.resume()
     }
     
-    func fetchPokemonData(of pokemon: String, onCompletion: @escaping ((Result<pokemonResponse, Error>) -> Void)) {
+    func getPokemonData(of pokemon: String, onCompletion: @escaping ((Result<PokemonResponse, Error>) -> Void)) {
         let urlString = "https://pokeapi.co/api/v2/pokemon/"
         let request = NSMutableURLRequest(url: NSURL(string: urlString + pokemon)! as URL,
                                           cachePolicy: .useProtocolCachePolicy,
@@ -99,7 +102,7 @@ struct APIManager: ApiManagerInterface {
                 print(error as Any)
             } else {
                 do {
-                    let decodedData = try JSONDecoder().decode(pokemonResponse.self, from: data!)
+                    let decodedData = try JSONDecoder().decode(PokemonResponse.self, from: data!)
                     DispatchQueue.main.async {
                         onCompletion(.success(decodedData))
                     }
