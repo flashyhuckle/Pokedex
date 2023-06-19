@@ -54,12 +54,14 @@ struct PokemonResponse: Decodable {
 }
 
 struct Pokemon {
-    let number: Int
+    var number: Int? = nil
     let name: String
-    let height: Int
-    let weight: Int
-    let image: UIImage
-    let mainType: String
+    var height: Int? = nil
+    var weight: Int? = nil
+    var image: UIImage? = nil
+    var imageURL: String? = nil
+    var mainType: String? = nil
+   
 }
 
 struct APIManager: ApiManagerInterface {

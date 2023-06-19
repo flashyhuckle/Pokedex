@@ -5,6 +5,7 @@ final class PokedexCollectionViewCell: UICollectionViewCell {
     private let mainContainerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.clipsToBounds = true
         return view
     }()
     
@@ -38,22 +39,42 @@ final class PokedexCollectionViewCell: UICollectionViewCell {
         mainContainerView.backgroundColor = .none
     }
     
-    func update(pokemon: Pokemon) {
+    func update(pokemon: Pokemon, viewModel: PokedexCollectionViewCellViewModel) {
         imageView.image = pokemon.image
-        nameLabel.text = pokemon.name
+        if let number = pokemon.number {
+            nameLabel.text = "\(number) " + pokemon.name
+        } else {
+            nameLabel.text = pokemon.name
+        }
+        
         mainContainerView.backgroundColor = getPokemonBackgroudColor(pokemon: pokemon)
+        
+        if pokemon.number == nil {
+            viewModel.didReceivePokemonData = { data in
+                let updatedPokemon = Pokemon(number: data.id,name: data.forms[0].name, height: data.height, weight: data.weight, imageURL: data.sprites.other.official.front_default, mainType: data.types[0].type.name)
+                self.update(pokemon: updatedPokemon, viewModel: viewModel)
+            }
+            viewModel.getPokemonData(pokemon: pokemon.name)
+        } else if pokemon.image == nil {
+            viewModel.didReceiveAvatar = { avatar in
+                let updatedPokemon = Pokemon(number: pokemon.number,name: pokemon.name, height: pokemon.height, weight: pokemon.weight, image: avatar, mainType: pokemon.mainType)
+                self.update(pokemon: updatedPokemon, viewModel: viewModel)
+            }
+            guard let imageURL = pokemon.imageURL else { return }
+            viewModel.getPokemonAvatar(pokemon: imageURL)
+        }
     }
     
     private func getPokemonBackgroudColor(pokemon: Pokemon) -> UIColor {
         switch pokemon.mainType {
-        case "grass": return .green
-        case "fire": return .red
-        case "water": return .blue
+        case "grass": return .systemGreen
+        case "fire": return .systemRed
+        case "water": return .systemBlue
         case "bug": return .systemGreen
         case "normal": return .white
         case "ground": return .brown
-        case "electric": return .yellow
-        case "poison": return .purple
+        case "electric": return .systemYellow
+        case "poison": return .systemPurple
         case "fairy": return .systemMint
         case "fighting": return .systemBrown
         case "psychic": return .systemPurple
@@ -70,7 +91,8 @@ final class PokedexCollectionViewCell: UICollectionViewCell {
         mainContainerView.addSubview(imageView)
         mainContainerView.addSubview(nameLabel)
         
-        contentView.layer.cornerRadius = 10
+        contentView.layer.cornerRadius = 20
+        contentView.clipsToBounds = true
         
         NSLayoutConstraint.activate([
             mainContainerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -89,5 +111,4 @@ final class PokedexCollectionViewCell: UICollectionViewCell {
             nameLabel.bottomAnchor.constraint(greaterThanOrEqualTo: mainContainerView.bottomAnchor, constant: -10.0)
         ])
     }
-    
 }

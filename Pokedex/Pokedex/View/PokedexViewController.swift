@@ -9,7 +9,7 @@ final class PokedexViewController: UIViewController {
     private lazy var collectionViewFlowLayout: UICollectionViewFlowLayout = {
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 5
+        layout.minimumLineSpacing = 10
         layout.itemSize = .init(width: 180, height: 100)
         return layout
     }()
@@ -40,21 +40,31 @@ final class PokedexViewController: UIViewController {
         viewModel.didReceivePokemonData = { pokemon in
             self.pokemonList.append(pokemon)
             self.pokemonList.sort {
-                $0.number < $1.number
+                $0.number! < $1.number!
             }
             self.pokedexCollectionView.reloadData()
         }
-        viewModel.getPokemonList()
+//        viewModel.getPokemonList()
+//        viewModel.getPokemones()
+        
+        viewModel.didReceivePokemonList = { list in
+            self.pokemonList = list
+            self.pokedexCollectionView.reloadData()
+        }
+        
+        viewModel.getPokemonList3()
     }
     
     func setUpViews() {
-        pokedexCollectionView.backgroundColor = .lightGray
+        title = "\(viewModel.generation)"
+        view.backgroundColor = .lightGray
+        pokedexCollectionView.backgroundColor = .clear
         view.addSubview(pokedexCollectionView)
         
         NSLayoutConstraint.activate([
-            pokedexCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            pokedexCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
             pokedexCollectionView.topAnchor.constraint(equalTo: view.topAnchor),
-            pokedexCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                                                           pokedexCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
             pokedexCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
@@ -67,7 +77,8 @@ extension PokedexViewController: UICollectionViewDelegate, UICollectionViewDataS
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PokedexCollectionViewCell", for: indexPath) as? PokedexCollectionViewCell else { return UICollectionViewCell() }
-        cell.update(pokemon: pokemonList[indexPath.row])
+        let viewModel = PokedexCollectionViewCellViewModel(apiManager: self.viewModel.apiManager)
+        cell.update(pokemon: pokemonList[indexPath.row], viewModel: viewModel)
         return cell
     }
     
