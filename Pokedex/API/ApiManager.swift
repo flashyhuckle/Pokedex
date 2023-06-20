@@ -1,11 +1,11 @@
 import UIKit
 
 protocol ApiManagerInterface {
-    func getPokemonList(generation: String, onCompletion: @escaping ((Swift.Result<PokemonListResponse, Error>) -> Void))
+    func getPokemonList(generation: String, onCompletion: @escaping ((Swift.Result<[Pokemon], Error>) -> Void))
     
-    func getPokemonData(of pokemon: String, onCompletion: @escaping ((Swift.Result<PokemonResponse, Error>) -> Void))
+    func getPokemonData(of pokemon: Pokemon, onCompletion: @escaping ((Swift.Result<Pokemon, Error>) -> Void))
     
-    func getPokemonAvatar(with url: String, onCompletion: @escaping ((Swift.Result<UIImage, Error>) -> Void))
+    func getPokemonAvatar(of pokemon: Pokemon, onCompletion: @escaping ((Swift.Result<Pokemon, Error>) -> Void))
 }
 
 struct PokemonListResponse: Decodable {
@@ -66,7 +66,7 @@ struct Pokemon {
 
 struct APIManager: ApiManagerInterface {
     
-    func getPokemonList(generation: String, onCompletion: @escaping ((Result<PokemonListResponse, Error>) -> Void)) {
+    func getPokemonList(generation: String, onCompletion: @escaping ((Result<[Pokemon], Error>) -> Void)) {
         let urlString = "https://pokeapi.co/api/v2/pokemon/" + generation
         let request = NSMutableURLRequest(url: NSURL(string: urlString)! as URL,
                                           cachePolicy: .useProtocolCachePolicy,
@@ -81,7 +81,11 @@ struct APIManager: ApiManagerInterface {
                 do {
                     let decodedData = try JSONDecoder().decode(PokemonListResponse.self, from: data!)
                     DispatchQueue.main.async {
-                        onCompletion(.success(decodedData))
+                        var pokemonArray = [Pokemon]()
+                        for i in 0...decodedData.results.count - 1 {
+                            pokemonArray.append(Pokemon(name: decodedData.results[i].name))
+                        }
+                        onCompletion(.success(pokemonArray))
                     }
                 } catch {
                     
@@ -91,9 +95,9 @@ struct APIManager: ApiManagerInterface {
         dataTask.resume()
     }
     
-    func getPokemonData(of pokemon: String, onCompletion: @escaping ((Result<PokemonResponse, Error>) -> Void)) {
+    func getPokemonData(of pokemon: Pokemon, onCompletion: @escaping ((Result<Pokemon, Error>) -> Void)) {
         let urlString = "https://pokeapi.co/api/v2/pokemon/"
-        let request = NSMutableURLRequest(url: NSURL(string: urlString + pokemon)! as URL,
+        let request = NSMutableURLRequest(url: NSURL(string: urlString + pokemon.name)! as URL,
                                           cachePolicy: .useProtocolCachePolicy,
                                           timeoutInterval: 10.0)
         request.httpMethod = "GET"
@@ -106,7 +110,8 @@ struct APIManager: ApiManagerInterface {
                 do {
                     let decodedData = try JSONDecoder().decode(PokemonResponse.self, from: data!)
                     DispatchQueue.main.async {
-                        onCompletion(.success(decodedData))
+                        let pokemon = Pokemon(number: decodedData.id, name: decodedData.forms[0].name, height: decodedData.height, weight: decodedData.weight, imageURL: decodedData.sprites.other.official.front_default, mainType: decodedData.types[0].type.name)
+                        onCompletion(.success(pokemon))
                     }
                 } catch {
                     
@@ -118,15 +123,18 @@ struct APIManager: ApiManagerInterface {
     
     
     func getPokemonAvatar(
-        with url: String,
-        onCompletion: @escaping ((Swift.Result<UIImage, Error>) -> Void)
+        of pokemon: Pokemon,
+        onCompletion: @escaping ((Swift.Result<Pokemon, Error>) -> Void)
     ) {
-        if let url = URL(string: url) {
+        guard let imageURL = pokemon.imageURL else { return }
+        if let url = URL(string: imageURL) {
             let session = URLSession(configuration: .default)
             let task = session.dataTask(with: url) { data, response, error in
                 if let data = data {
                     DispatchQueue.main.async {
-                        onCompletion(.success(UIImage(data: data)!))
+                        guard let image = UIImage(data: data) else { return }
+                        let completePokemon = Pokemon(number: pokemon.number, name: pokemon.name, height: pokemon.height, weight: pokemon.weight, image: image, imageURL: pokemon.imageURL, mainType: pokemon.mainType)
+                        onCompletion(.success(completePokemon))
                     }
                 }
                 if let error = error {

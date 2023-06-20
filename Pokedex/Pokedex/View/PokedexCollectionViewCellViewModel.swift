@@ -6,8 +6,8 @@ final class PokedexCollectionViewCellViewModel {
     let apiManager: ApiManagerInterface
     
     // MARK: - Output
-    var didReceivePokemonData: ((PokemonResponse) -> Void)?
-    var didReceiveAvatar: ((UIImage?) -> Void)?
+    var didReceivePokemonData: ((Pokemon) -> Void)?
+    var didReceiveCompletePokemon: ((Pokemon) -> Void)?
     
     // MARK: - Initialization
     init(
@@ -17,7 +17,18 @@ final class PokedexCollectionViewCellViewModel {
     }
     
     //MARK: - Lifecycle
-    func getPokemonData(pokemon: String) {
+    func update(pokemon: Pokemon) {
+        if pokemon.number == nil {
+            didReceivePokemonData = { updatedPokemon in
+                self.update(pokemon: updatedPokemon)
+            }
+            getPokemonData(pokemon: pokemon)
+        } else if pokemon.image == nil {
+            getPokemonAvatar(pokemon: pokemon)
+        }
+    }
+    
+    func getPokemonData(pokemon: Pokemon) {
         apiManager.getPokemonData(of: pokemon) { result in
             switch result {
             case .success(let pokemon):
@@ -28,11 +39,11 @@ final class PokedexCollectionViewCellViewModel {
         }
     }
     
-    func getPokemonAvatar(pokemon: String) {
-        apiManager.getPokemonAvatar(with: pokemon) { result in
+    func getPokemonAvatar(pokemon: Pokemon) {
+        apiManager.getPokemonAvatar(of: pokemon) { result in
             switch result {
-            case .success(let avatar):
-                self.didReceiveAvatar?(avatar)
+            case .success(let pokemon):
+                self.didReceiveCompletePokemon?(pokemon)
             case .failure(let error):
                 print("Error: \(error)")
             }

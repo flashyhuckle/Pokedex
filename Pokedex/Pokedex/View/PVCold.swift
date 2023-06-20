@@ -35,7 +35,7 @@ class PVC: UIViewController {
             self.tableView.reloadData()
         }
         
-        viewModel.getPokemonList()
+//        viewModel.getPokemonList()
     }
     
     func setUpViews() {

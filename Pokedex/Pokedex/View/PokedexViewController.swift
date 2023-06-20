@@ -37,22 +37,12 @@ final class PokedexViewController: UIViewController {
         super.viewDidLoad()
         setUpViews()
         
-        viewModel.didReceivePokemonData = { pokemon in
-            self.pokemonList.append(pokemon)
-            self.pokemonList.sort {
-                $0.number! < $1.number!
-            }
-            self.pokedexCollectionView.reloadData()
-        }
-//        viewModel.getPokemonList()
-//        viewModel.getPokemones()
-        
         viewModel.didReceivePokemonList = { list in
             self.pokemonList = list
             self.pokedexCollectionView.reloadData()
         }
         
-        viewModel.getPokemonList3()
+        viewModel.getPokemonList()
     }
     
     func setUpViews() {

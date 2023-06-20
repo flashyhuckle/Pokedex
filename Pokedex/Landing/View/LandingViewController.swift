@@ -19,8 +19,6 @@ class LandingViewController: UIViewController {
     
     private let viewModel: LandingViewModel
     
-//    var pokemonArray = [PokemonGeneration]()
-//    lazy var selectedPokemon = pokemonArray[0]
     lazy var selectedGeneration = PokemonGeneration.Generation1
     
     let manager = APIManager()
@@ -72,7 +70,6 @@ class LandingViewController: UIViewController {
         VCPickerView.delegate = self
         
         setUpView()
-//        getPokemonList()
     }
     
     private func setUpView() {
@@ -102,43 +99,7 @@ class LandingViewController: UIViewController {
     }
     
     @objc func getPokemonList() {
-//        manager.fetchPokemonList(generation: selectedGeneration.rawValue) { response in
-//            switch response {
-//                case .success(let pokemonList):
-////                self.pokemonArray = [String]()
-////                for i in 0..<pokemonList.results.count {
-////                    self.pokemonArray.append(pokemonList.results[i].name)
-////                }
-//                self.VCPickerView.reloadAllComponents()
-//            case .failure(let error):
-//                print(error)
-//            }
-//        }
         viewModel.tapSearch(generation: selectedGeneration)
-    }
-    
-    @objc func pokedex() {
-        return
-//        manager.fetchPokemonData(of: selectedPokemon) { response in
-//            switch response {
-//            case .success(let pokemon):
-//                self.getAvatar(string: pokemon.sprites.other.official.front_default)
-//                self.label.text = pokemon.forms[0].name + " " + "height: \(Double(pokemon.height)/10), weight \(Double(pokemon.weight)/10)"
-//            case .failure(let error):
-//                print(error)
-//            }
-//        }
-    }
-    
-    func getAvatar(string: String) {
-        manager.getPokemonAvatar(with: string) { response in
-            switch response {
-            case .success(let image):
-                self.imageView.image = image
-            case .failure(let error):
-                print(error)
-            }
-        }
     }
 }
 
@@ -157,7 +118,6 @@ extension LandingViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-//        selectedPokemon = pokemonArray[row]
         selectedGeneration = PokemonGeneration.allCases[row]
     }
 }

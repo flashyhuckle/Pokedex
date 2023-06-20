@@ -41,28 +41,14 @@ final class PokedexCollectionViewCell: UICollectionViewCell {
     
     func update(pokemon: Pokemon, viewModel: PokedexCollectionViewCellViewModel) {
         imageView.image = pokemon.image
-        if let number = pokemon.number {
-            nameLabel.text = "\(number) " + pokemon.name
-        } else {
-            nameLabel.text = pokemon.name
-        }
-        
+        nameLabel.text = pokemon.name
         mainContainerView.backgroundColor = getPokemonBackgroudColor(pokemon: pokemon)
-        
-        if pokemon.number == nil {
-            viewModel.didReceivePokemonData = { data in
-                let updatedPokemon = Pokemon(number: data.id,name: data.forms[0].name, height: data.height, weight: data.weight, imageURL: data.sprites.other.official.front_default, mainType: data.types[0].type.name)
-                self.update(pokemon: updatedPokemon, viewModel: viewModel)
-            }
-            viewModel.getPokemonData(pokemon: pokemon.name)
-        } else if pokemon.image == nil {
-            viewModel.didReceiveAvatar = { avatar in
-                let updatedPokemon = Pokemon(number: pokemon.number,name: pokemon.name, height: pokemon.height, weight: pokemon.weight, image: avatar, mainType: pokemon.mainType)
-                self.update(pokemon: updatedPokemon, viewModel: viewModel)
-            }
-            guard let imageURL = pokemon.imageURL else { return }
-            viewModel.getPokemonAvatar(pokemon: imageURL)
+
+        viewModel.didReceiveCompletePokemon = { completePokemon in
+            self.update(pokemon: completePokemon, viewModel: viewModel)
         }
+        
+        viewModel.update(pokemon: pokemon)
     }
     
     private func getPokemonBackgroudColor(pokemon: Pokemon) -> UIColor {
