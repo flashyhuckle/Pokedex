@@ -27,13 +27,13 @@ class PVC: UIViewController {
         setUpViews()
         tableView.dataSource = self
         
-        viewModel.didReceivePokemonData = { pokemon in
-            self.pokemonList.append(pokemon)
-//            self.pokemonList.sort {
-//                $0.number < $1.number
-//            }
-            self.tableView.reloadData()
-        }
+//        viewModel.didReceivePokemonData = { pokemon in
+//            self.pokemonList.append(pokemon)
+////            self.pokemonList.sort {
+////                $0.number < $1.number
+////            }
+//            self.tableView.reloadData()
+//        }
         
 //        viewModel.getPokemonList()
     }

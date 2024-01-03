@@ -21,7 +21,7 @@ class LandingViewController: UIViewController {
     
     lazy var selectedGeneration = PokemonGeneration.Generation1
     
-    let manager = APIManager()
+//    let manager = APIManager()
     
     private lazy var VCPickerView: UIPickerView = {
         let pickerView = UIPickerView()

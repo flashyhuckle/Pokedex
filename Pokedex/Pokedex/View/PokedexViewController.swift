@@ -53,8 +53,7 @@ final class PokedexViewController: UIViewController {
         
         NSLayoutConstraint.activate([
             pokedexCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
-            pokedexCollectionView.topAnchor.constraint(equalTo: view.topAnchor),
-                                                           pokedexCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            pokedexCollectionView.topAnchor.constraint(equalTo: view.topAnchor), pokedexCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
             pokedexCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
@@ -67,8 +66,25 @@ extension PokedexViewController: UICollectionViewDelegate, UICollectionViewDataS
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PokedexCollectionViewCell", for: indexPath) as? PokedexCollectionViewCell else { return UICollectionViewCell() }
-        let viewModel = PokedexCollectionViewCellViewModel(apiManager: self.viewModel.apiManager)
-        cell.update(pokemon: pokemonList[indexPath.row], viewModel: viewModel)
+//        let viewModel = PokedexCollectionViewCellViewModel(apiManager: self.viewModel.apiManager)
+        
+        cell.update(
+            pokemon: pokemonList[indexPath.row]
+//            viewModel: viewModel
+        )
+
+//        cell.didReceiveCompletePokemon = { [weak self] completePokemon in
+//            guard let self = self else { return }
+//
+//            guard let pokemonNumber = completePokemon.number else { return }
+//            guard let indexCorrector = pokemonList.first?.number else { return }
+//            if pokemonList[pokemonNumber - indexCorrector].image == nil {
+//                pokemonList[pokemonNumber - indexCorrector].number = completePokemon.number
+//                pokemonList[pokemonNumber - indexCorrector].image = completePokemon.image
+//                pokemonList[pokemonNumber - indexCorrector].mainType = completePokemon.mainType
+//            }
+//        }
+
         return cell
     }
     

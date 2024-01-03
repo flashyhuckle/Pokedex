@@ -61,7 +61,6 @@ struct Pokemon {
     var image: UIImage? = nil
     var imageURL: String? = nil
     var mainType: String? = nil
-   
 }
 
 struct APIManager: ApiManagerInterface {

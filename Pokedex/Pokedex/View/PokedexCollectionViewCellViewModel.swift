@@ -2,7 +2,7 @@ import UIKit
 
 final class PokedexCollectionViewCellViewModel {
     
-    // MARK: - Input
+    // MARK: - Dependency
     let apiManager: ApiManagerInterface
     
     // MARK: - Output

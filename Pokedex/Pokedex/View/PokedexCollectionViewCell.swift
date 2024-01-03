@@ -1,7 +1,9 @@
 import UIKit
 
 final class PokedexCollectionViewCell: UICollectionViewCell {
-    
+
+    var didReceiveCompletePokemon: ((Pokemon) -> Void)?
+
     private let mainContainerView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -39,16 +41,21 @@ final class PokedexCollectionViewCell: UICollectionViewCell {
         mainContainerView.backgroundColor = .none
     }
     
-    func update(pokemon: Pokemon, viewModel: PokedexCollectionViewCellViewModel) {
+    func update(
+        pokemon: Pokemon
+//        viewModel: PokedexCollectionViewCellViewModel
+    ) {
         imageView.image = pokemon.image
         nameLabel.text = pokemon.name
         mainContainerView.backgroundColor = getPokemonBackgroudColor(pokemon: pokemon)
 
-        viewModel.didReceiveCompletePokemon = { completePokemon in
-            self.update(pokemon: completePokemon, viewModel: viewModel)
-        }
-        
-        viewModel.update(pokemon: pokemon)
+//        viewModel.didReceiveCompletePokemon = { [weak self] completePokemon in
+//            guard let self = self else { return }
+//            self.didReceiveCompletePokemon?(completePokemon)
+//            self.update(pokemon: completePokemon, viewModel: viewModel)
+//        }
+//        
+//        viewModel.update(pokemon: pokemon)
     }
     
     private func getPokemonBackgroudColor(pokemon: Pokemon) -> UIColor {
